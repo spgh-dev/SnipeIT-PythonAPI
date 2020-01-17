@@ -371,3 +371,46 @@ class Assets(object):
         results = requests.patch(self.server, headers=headers, data=payload)
         jsonData = json.loads(results.content)
         return jsonData['status']
+
+    def checkout(self, server, token, asset_id, checkout_to_type, assigned_user=None, assigned_asset=None, assigned_location=None, expected_checkin=None, checkout_at=None, new_asset_name=None, note=None):
+        """Create new asset data
+
+        Arguments:
+            server {string} -- Server URI
+            token {string} -- Token value to be used for accessing the API
+            asset_id {integer} -- id of the asset to be checked out
+            checkout_to_type {string} -- Type of entity the asset is being checked out to: user, asset, or location
+            assigned_user {integer} -- The asset ID to associate the asset to
+            assigned_asset {integer} -- The location ID to check the asset out to
+            assigned_location {integer} -- The location ID to check the asset out to
+            expected_checkin {string} -- Optional date the asset is expected to be checked in
+            checkout_at {string} -- Optional date to override the checkout time of now
+            new_asset_name {string} -- Optional new asset name
+            note {string} -- Optional note about the checkout
+
+        Returns:
+            [string] -- Server response in JSON formatted
+        """
+        self.uri = '/api/v1/hardware/'+str(asset_id)+'/checkout'
+        self.server = server + self.uri
+        headers = {'Content-Type': 'application/json','Authorization': 'Bearer ' + token}
+        request_data = {'checkout_to_type':checkout_to_type}
+        
+        if assigned_user is not None:
+            request_data['assigned_user']=assigned_user
+        if assigned_asset is not None:
+            request_data['assiged_asset']=assigned_asset
+        if assigned_location is not None:
+            request_data['assigned_location']=assigned_location
+        if expected_checkin is not None:
+            request_data['expected_checkin']=expected_checkin
+        if checkout_at is not None:
+            request_data['checkout_at']=checkout_at
+        if new_asset_name is not None:
+            request_data['name']=new_asset_name
+        if note is not None:
+            request_data['note']=note
+        print(request_data)
+        results = requests.post(self.server, headers=headers, data=json.dumps(request_data))
+        return results
+
